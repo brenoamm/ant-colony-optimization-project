@@ -1,0 +1,228 @@
+-- The C compiler identification is GNU 8.2.0
+-- The CXX compiler identification is GNU 8.2.0
+-- Check for working C compiler: /Applic.HPC/Easybuild/ivybridge/2019a/software/GCCcore/8.2.0/bin/cc
+-- Check for working C compiler: /Applic.HPC/Easybuild/ivybridge/2019a/software/GCCcore/8.2.0/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Check for working CXX compiler: /Applic.HPC/Easybuild/ivybridge/2019a/software/GCCcore/8.2.0/bin/c++
+-- Check for working CXX compiler: /Applic.HPC/Easybuild/ivybridge/2019a/software/GCCcore/8.2.0/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Host System: Linux-3.10.0-1160.15.2.el7.x86_64
+-- compiler id: GNU
+-- compiler flags: 
+-- compiler flags debug: -g
+-- compiler flags release: -O3 -DNDEBUG
+-- compiler flags minsizerel: -Os -DNDEBUG
+-- compiler flags relwithdebinfo: -O2 -g -DNDEBUG
+-- Found MPI_C: /Applic.HPC/Easybuild/ivybridge/2019a/software/OpenMPI/3.1.3-gcccuda-2019a/lib/libmpi.so (found version "3.1") 
+-- Found MPI_CXX: /Applic.HPC/Easybuild/ivybridge/2019a/software/OpenMPI/3.1.3-gcccuda-2019a/lib/libmpi.so (found version "3.1") 
+-- Found MPI: TRUE (found version "3.1")  
+-- mpi compiler: /Applic.HPC/Easybuild/ivybridge/2019a/software/OpenMPI/3.1.3-gcccuda-2019a/bin/mpicxx
+-- mpi compile flags: 
+-- mpi link flags: -Wl,-rpath -Wl,/Applic.HPC/Easybuild/ivybridge/2019a/software/hwloc/1.11.11-GCCcore-8.2.0/lib -Wl,-rpath -Wl,/Applic.HPC/Easybuild/ivybridge/2019a/software/OpenMPI/3.1.3-gcccuda-2019a/lib -Wl,--enable-new-dtags -L/Applic.HPC/Easybuild/ivybridge/2019a/software/hwloc/1.11.11-GCCcore-8.2.0/lib
+-- mpi libraries: /Applic.HPC/Easybuild/ivybridge/2019a/software/OpenMPI/3.1.3-gcccuda-2019a/lib/libmpi.so
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - found
+-- Found Threads: TRUE  
+-- Found CUDA: /Applic.HPC/Easybuild/ivybridge/2019a/software/CUDA/10.1.105-GCC-8.2.0-2.31.1 (found version "10.1") 
+-- Performing Test compiler_flag_wall
+-- Performing Test compiler_flag_wall - Success
+-- Performing Test compiler_flag_marchnative
+-- Performing Test compiler_flag_marchnative - Success
+-- Performing Test compiler_flag_fno_strict_aliasing
+-- Performing Test compiler_flag_fno_strict_aliasing - Success
+-- Performing Test compiler_flag_dmpich_ignore_cxx_seek
+-- Performing Test compiler_flag_dmpich_ignore_cxx_seek - Success
+-- Performing Test compiler_flag_wno_unknown_pragmas
+-- Performing Test compiler_flag_wno_unknown_pragmas - Success
+-- Performing Test compiler_flag_wno_reorder
+-- Performing Test compiler_flag_wno_reorder - Success
+-- Performing Test compiler_flag_mmic
+-- Performing Test compiler_flag_mmic - Failed
+-- Performing Test compiler_flag_vec_report1
+-- Performing Test compiler_flag_vec_report1 - Failed
+-- Performing Test compiler_flag_dmpich_skip_mpicxx
+-- Performing Test compiler_flag_dmpich_skip_mpicxx - Success
+-- Found Boost 1.70.0 at /Applic.HPC/Easybuild/ivybridge/2019a/software/Boost/1.70.0-gompic-2019a/lib/cmake/Boost-1.70.0
+--   Requested configuration: QUIET COMPONENTS program_options;timer
+-- Found boost_headers 1.70.0 at /Applic.HPC/Easybuild/ivybridge/2019a/software/Boost/1.70.0-gompic-2019a/lib/cmake/boost_headers-1.70.0
+-- Found boost_program_options 1.70.0 at /Applic.HPC/Easybuild/ivybridge/2019a/software/Boost/1.70.0-gompic-2019a/lib/cmake/boost_program_options-1.70.0
+--   libboost_program_options.a
+-- Adding boost_program_options dependencies: headers
+-- Found boost_timer 1.70.0 at /Applic.HPC/Easybuild/ivybridge/2019a/software/Boost/1.70.0-gompic-2019a/lib/cmake/boost_timer-1.70.0
+--   libboost_timer.a
+-- Adding boost_timer dependencies: chrono;headers
+-- Found boost_chrono 1.70.0 at /Applic.HPC/Easybuild/ivybridge/2019a/software/Boost/1.70.0-gompic-2019a/lib/cmake/boost_chrono-1.70.0
+--   libboost_chrono.a
+-- Adding boost_chrono dependencies: headers
+-- Found Boost: /Applic.HPC/Easybuild/ivybridge/2019a/software/Boost/1.70.0-gompic-2019a/lib/cmake/Boost-1.70.0/BoostConfig.cmake (found version "1.70.0") found components:  program_options timer 
+-- Boost include path: /Applic.HPC/Easybuild/ivybridge/2019a/software/Boost/1.70.0-gompic-2019a/include
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/b/b_mene01/ls_pi-research_aco-bpp/BPP/k20/build/release
+[ 10%] Building NVCC (Device) object CMakeFiles/aco_cuda_v3_ref.dir/src/aco_cuda_v3_ref_generated_aco_v3_cuda_algorithm.cu.o
+[ 20%] Building NVCC (Device) object CMakeFiles/aco_cuda_v3_ref.dir/src/aco_cuda_v3_ref_generated_aco_v3_cuda.cu.o
+Scanning dependencies of target aco_cuda_v3_ref
+[ 30%] Linking CXX executable bin/aco_cuda_v3_ref
+[ 30%] Built target aco_cuda_v3_ref
+Scanning dependencies of target aco_seq_ref
+[ 40%] Building CXX object CMakeFiles/aco_seq_ref.dir/src/aco_seq.cpp.o
+[ 50%] Building CXX object CMakeFiles/aco_seq_ref.dir/src/aco_seq_algorithm.cpp.o
+[ 60%] Building CXX object CMakeFiles/aco_seq_ref.dir/src/Randoms.cpp.o
+[ 70%] Linking CXX executable bin/aco_seq_ref
+[ 70%] Built target aco_seq_ref
+[ 80%] Building NVCC (Device) object CMakeFiles/aco_cuda_v2_ref.dir/src/aco_cuda_v2_ref_generated_aco_v2_cuda_algorithm.cu.o
+[ 90%] Building NVCC (Device) object CMakeFiles/aco_cuda_v2_ref.dir/src/aco_cuda_v2_ref_generated_aco_v2_cuda.cu.o
+Scanning dependencies of target aco_cuda_v2_ref
+[100%] Linking CXX executable bin/aco_cuda_v2_ref
+[100%] Built target aco_cuda_v2_ref
+run; iterations; problem; colony size; Fitness; Total Time 
+Problem, Block-Size,  Ants, Time,  Fitness 
+
+ 0, 256, 1024, 0.445289 , 21 
+ 0, 256, 1024, 0.445743 , 21 
+ 0, 256, 1024, 0.445420 , 21 
+ 0, 256, 1024, 0.445283 , 21 
+ 0, 256, 1024, 0.446810 , 21 
+ 0, 256, 2048, 0.597566 , 21 
+ 0, 256, 2048, 0.597910 , 21 
+ 0, 256, 2048, 0.597754 , 21 
+ 0, 256, 2048, 0.597749 , 21 
+ 0, 256, 2048, 0.597311 , 21 
+ 0, 256, 4096, 1.049244 , 21 
+ 0, 256, 4096, 1.048650 , 21 
+ 0, 256, 4096, 1.048937 , 21 
+ 0, 256, 4096, 1.048776 , 21 
+ 0, 256, 4096, 1.047892 , 21 
+ 0, 256, 8192, 2.616218 , 21 
+ 0, 256, 8192, 2.616483 , 21 
+ 0, 256, 8192, 2.616854 , 21 
+ 0, 256, 8192, 2.619239 , 21 
+ 0, 256, 8192, 2.620192 , 21 
+ End Of Execution 
+Problem, Block-Size,  Ants, Time,  Fitness 
+
+ 1, 256, 1024, 3.574394 , 66 
+ 1, 256, 1024, 3.575325 , 66 
+ 1, 256, 1024, 3.569780 , 66 
+ 1, 256, 1024, 3.568854 , 66 
+ 1, 256, 1024, 3.572895 , 66 
+ 1, 256, 2048, 4.777872 , 66 
+ 1, 256, 2048, 4.783410 , 66 
+ 1, 256, 2048, 4.774796 , 66 
+ 1, 256, 2048, 4.780240 , 66 
+ 1, 256, 2048, 4.781857 , 66 
+ 1, 256, 4096, 8.978277 , 66 
+ 1, 256, 4096, 8.981611 , 66 
+ 1, 256, 4096, 8.983716 , 66 
+ 1, 256, 4096, 8.971681 , 66 
+ 1, 256, 4096, 8.972868 , 66 
+ 1, 256, 8192, 26.613527 , 66 
+ 1, 256, 8192, 26.593139 , 66 
+ 1, 256, 8192, 26.610851 , 66 
+ 1, 256, 8192, 26.574964 , 66 
+ 1, 256, 8192, 26.581636 , 66 
+ End Of Execution 
+Problem, Block-Size,  Ants, Time,  Fitness 
+
+ 2, 256, 1024, 15.700127 , 134 
+ 2, 256, 1024, 15.702538 , 134 
+ 2, 256, 1024, 15.703846 , 134 
+ 2, 256, 1024, 15.700341 , 134 
+ 2, 256, 1024, 15.699968 , 134 
+ 2, 256, 2048, 20.850236 , 134 
+ 2, 256, 2048, 20.860687 , 134 
+ 2, 256, 2048, 20.840968 , 134 
+ 2, 256, 2048, 20.858674 , 134 
+ 2, 256, 2048, 20.854190 , 134 
+ 2, 256, 4096, 39.724111 , 134 
+ 2, 256, 4096, 39.735022 , 134 
+ 2, 256, 4096, 39.718512 , 134 
+ 2, 256, 4096, 39.732829 , 134 
+ 2, 256, 4096, 39.722340 , 134 
+ 2, 256, 8192, 115.171786 , 134 
+ 2, 256, 8192, 115.224847 , 134 
+ 2, 256, 8192, 115.124826 , 134 
+ 2, 256, 8192, 115.204740 , 134 
+ 2, 256, 8192, 115.136821 , 134 
+ End Of Execution 
+Problem, Block-Size,  Ants, Time,  Fitness 
+
+ 3, 256, 1024, 33.894087 , 201 
+ 3, 256, 1024, 33.877153 , 201 
+ 3, 256, 1024, 33.858344 , 201 
+ 3, 256, 1024, 33.888651 , 201 
+ 3, 256, 1024, 33.863274 , 201 
+ 3, 256, 2048, 44.716971 , 201 
+ 3, 256, 2048, 44.737533 , 201 
+ 3, 256, 2048, 44.697304 , 201 
+ 3, 256, 2048, 44.699764 , 201 
+ 3, 256, 2048, 44.729013 , 201 
+ 3, 256, 4096, 83.408899 , 201 
+ 3, 256, 4096, 83.404912 , 201 
+ 3, 256, 4096, 83.281868 , 201 
+ 3, 256, 4096, 83.370454 , 201 
+ 3, 256, 4096, 83.436293 , 201 
+ 3, 256, 8192, 249.591564 , 201 
+ 3, 256, 8192, 249.527777 , 201 
+ 3, 256, 8192, 249.591121 , 201 
+ 3, 256, 8192, 249.574844 , 201 
+ 3, 256, 8192, 249.323552 , 201 
+ End Of Execution 
+Problem, Block-Size,  Ants, Time,  Fitness 
+
+ 4, 256, 1024, 60.407640 , 269 
+ 4, 256, 1024, 60.365009 , 269 
+ 4, 256, 1024, 60.387530 , 269 
+ 4, 256, 1024, 60.399811 , 269 
+ 4, 256, 1024, 60.399341 , 269 
+ 4, 256, 2048, 79.250490 , 269 
+ 4, 256, 2048, 79.398866 , 269 
+ 4, 256, 2048, 79.309961 , 269 
+ 4, 256, 2048, 79.311979 , 269 
+ 4, 256, 2048, 79.236597 , 269 
+ 4, 256, 4096, 153.187533 , 269 
+ 4, 256, 4096, 153.170682 , 269 
+ 4, 256, 4096, 153.192559 , 269 
+ 4, 256, 4096, 153.192204 , 269 
+ 4, 256, 4096, 153.193048 , 269 
+ 4, 256, 8192, 465.117381 , 269 
+ 4, 256, 8192, 465.017430 , 269 
+ 4, 256, 8192, 465.279940 , 269 
+ 4, 256, 8192, 465.086818 , 269 
+ 4, 256, 8192, 465.022368 , 269 
+ End Of Execution 
+Problem, Block-Size,  Ants, Time,  Fitness 
+
+ 5, 256, 1024, 100.512700 , 338 
+ 5, 256, 1024, 100.531745 , 338 
+ 5, 256, 1024, 100.507526 , 338 
+ 5, 256, 1024, 100.532215 , 338 
+ 5, 256, 1024, 100.569350 , 338 
+ 5, 256, 2048, 135.207578 , 337 
+ 5, 256, 2048, 135.317980 , 337 
+ 5, 256, 2048, 135.196523 , 337 
+ 5, 256, 2048, 135.244695 , 337 
+ 5, 256, 2048, 135.248367 , 337 
+ 5, 256, 4096, 248.827406 , 337 
+ 5, 256, 4096, 248.805130 , 337 
+ 5, 256, 4096, 248.792596 , 337 
+ 5, 256, 4096, 248.803078 , 337 
+ 5, 256, 4096, 248.784717 , 337 
+ 5, 256, 8192, 751.283344 , 337 
+ 5, 256, 8192, 751.403478 , 337 
+ 5, 256, 8192, 751.125009 , 337 
+ 5, 256, 8192, 751.006123 , 337 
+ 5, 256, 8192, 751.485913 , 337 
+ End Of Execution 

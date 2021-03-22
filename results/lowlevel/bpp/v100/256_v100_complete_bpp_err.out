@@ -1,0 +1,28 @@
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) palma/2019a
+CMake Warning (dev) at CMakeLists.txt:34 (find_package):
+  Policy CMP0074 is not set: find_package uses <PackageName>_ROOT variables.
+  Run "cmake --help-policy CMP0074" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+
+  Environment variable CUDA_ROOT is set to:
+
+    /Applic.HPC/Easybuild/skylake/2019a/software/CUDA/10.1.105-GCC-8.2.0-2.31.1
+
+  For compatibility, CMake is ignoring the variable.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+/Applic.HPC/Easybuild/skylake/2019a/software/Boost/1.70.0-gompic-2019a/include/boost/mpl/assert.hpp:193:42: warning: unnecessary parentheses in declaration of ‘assert_arg’ [-Wparentheses]
+ template< typename Pred >
+                                          ^
+/Applic.HPC/Easybuild/skylake/2019a/software/Boost/1.70.0-gompic-2019a/include/boost/mpl/assert.hpp:198:42: warning: unnecessary parentheses in declaration of ‘assert_not_arg’ [-Wparentheses]
+ template< typename Pred >
+                                          ^
+/Applic.HPC/Easybuild/skylake/2019a/software/Boost/1.70.0-gompic-2019a/include/boost/mpl/assert.hpp:193:42: warning: unnecessary parentheses in declaration of ‘assert_arg’ [-Wparentheses]
+ template< typename Pred >
+                                          ^
+/Applic.HPC/Easybuild/skylake/2019a/software/Boost/1.70.0-gompic-2019a/include/boost/mpl/assert.hpp:198:42: warning: unnecessary parentheses in declaration of ‘assert_not_arg’ [-Wparentheses]
+ template< typename Pred >
+                                          ^
