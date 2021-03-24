@@ -1,95 +1,3 @@
--- The C compiler identification is GNU 8.2.0
--- The CXX compiler identification is GNU 8.2.0
--- Check for working C compiler: /Applic.HPC/Easybuild/skylake/2019a/software/GCCcore/8.2.0/bin/cc
--- Check for working C compiler: /Applic.HPC/Easybuild/skylake/2019a/software/GCCcore/8.2.0/bin/cc -- works
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Detecting C compile features
--- Detecting C compile features - done
--- Check for working CXX compiler: /Applic.HPC/Easybuild/skylake/2019a/software/GCCcore/8.2.0/bin/c++
--- Check for working CXX compiler: /Applic.HPC/Easybuild/skylake/2019a/software/GCCcore/8.2.0/bin/c++ -- works
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Detecting CXX compile features
--- Detecting CXX compile features - done
--- Host System: Linux-3.10.0-1160.15.2.el7.x86_64
--- compiler id: GNU
--- compiler flags: 
--- compiler flags debug: -g
--- compiler flags release: -O3 -DNDEBUG
--- compiler flags minsizerel: -Os -DNDEBUG
--- compiler flags relwithdebinfo: -O2 -g -DNDEBUG
--- Found MPI_C: /Applic.HPC/Easybuild/skylake/2019a/software/OpenMPI/3.1.3-gcccuda-2019a/lib/libmpi.so (found version "3.1") 
--- Found MPI_CXX: /Applic.HPC/Easybuild/skylake/2019a/software/OpenMPI/3.1.3-gcccuda-2019a/lib/libmpi.so (found version "3.1") 
--- Found MPI: TRUE (found version "3.1")  
--- mpi compiler: /Applic.HPC/Easybuild/skylake/2019a/software/OpenMPI/3.1.3-gcccuda-2019a/bin/mpicxx
--- mpi compile flags: 
--- mpi link flags: -Wl,-rpath -Wl,/Applic.HPC/Easybuild/skylake/2019a/software/Compiler/GCCcore/8.2.0/hwloc/1.11.11/lib -Wl,-rpath -Wl,/Applic.HPC/Easybuild/skylake/2019a/software/OpenMPI/3.1.3-gcccuda-2019a/lib -Wl,--enable-new-dtags -L/Applic.HPC/Easybuild/skylake/2019a/software/Compiler/GCCcore/8.2.0/hwloc/1.11.11/lib
--- mpi libraries: /Applic.HPC/Easybuild/skylake/2019a/software/OpenMPI/3.1.3-gcccuda-2019a/lib/libmpi.so
--- Looking for pthread.h
--- Looking for pthread.h - found
--- Performing Test CMAKE_HAVE_LIBC_PTHREAD
--- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
--- Looking for pthread_create in pthreads
--- Looking for pthread_create in pthreads - not found
--- Looking for pthread_create in pthread
--- Looking for pthread_create in pthread - found
--- Found Threads: TRUE  
--- Found CUDA: /Applic.HPC/Easybuild/skylake/2019a/software/CUDA/10.1.105-GCC-8.2.0-2.31.1 (found version "10.1") 
--- Performing Test compiler_flag_wall
--- Performing Test compiler_flag_wall - Success
--- Performing Test compiler_flag_marchnative
--- Performing Test compiler_flag_marchnative - Success
--- Performing Test compiler_flag_fno_strict_aliasing
--- Performing Test compiler_flag_fno_strict_aliasing - Success
--- Performing Test compiler_flag_dmpich_ignore_cxx_seek
--- Performing Test compiler_flag_dmpich_ignore_cxx_seek - Success
--- Performing Test compiler_flag_wno_unknown_pragmas
--- Performing Test compiler_flag_wno_unknown_pragmas - Success
--- Performing Test compiler_flag_wno_reorder
--- Performing Test compiler_flag_wno_reorder - Success
--- Performing Test compiler_flag_mmic
--- Performing Test compiler_flag_mmic - Failed
--- Performing Test compiler_flag_vec_report1
--- Performing Test compiler_flag_vec_report1 - Failed
--- Performing Test compiler_flag_dmpich_skip_mpicxx
--- Performing Test compiler_flag_dmpich_skip_mpicxx - Success
--- Found Boost 1.70.0 at /Applic.HPC/Easybuild/skylake/2019a/software/Boost/1.70.0-gompic-2019a/lib/cmake/Boost-1.70.0
---   Requested configuration: QUIET COMPONENTS program_options;timer
--- Found boost_headers 1.70.0 at /Applic.HPC/Easybuild/skylake/2019a/software/Boost/1.70.0-gompic-2019a/lib/cmake/boost_headers-1.70.0
--- Found boost_program_options 1.70.0 at /Applic.HPC/Easybuild/skylake/2019a/software/Boost/1.70.0-gompic-2019a/lib/cmake/boost_program_options-1.70.0
---   libboost_program_options.a
--- Adding boost_program_options dependencies: headers
--- Found boost_timer 1.70.0 at /Applic.HPC/Easybuild/skylake/2019a/software/Boost/1.70.0-gompic-2019a/lib/cmake/boost_timer-1.70.0
---   libboost_timer.a
--- Adding boost_timer dependencies: chrono;headers
--- Found boost_chrono 1.70.0 at /Applic.HPC/Easybuild/skylake/2019a/software/Boost/1.70.0-gompic-2019a/lib/cmake/boost_chrono-1.70.0
---   libboost_chrono.a
--- Adding boost_chrono dependencies: headers
--- Found Boost: /Applic.HPC/Easybuild/skylake/2019a/software/Boost/1.70.0-gompic-2019a/lib/cmake/Boost-1.70.0/BoostConfig.cmake (found version "1.70.0") found components:  program_options timer 
--- Boost include path: /Applic.HPC/Easybuild/skylake/2019a/software/Boost/1.70.0-gompic-2019a/include
--- Configuring done
--- Generating done
--- Build files have been written to: /home/b/b_mene01/ls_pi-research_aco-bpp/BPP/v100/build/release
-[ 10%] Building NVCC (Device) object CMakeFiles/aco_cuda_v3_ref.dir/src/aco_cuda_v3_ref_generated_aco_v3_cuda_algorithm.cu.o
-[ 20%] Building NVCC (Device) object CMakeFiles/aco_cuda_v3_ref.dir/src/aco_cuda_v3_ref_generated_aco_v3_cuda.cu.o
-Scanning dependencies of target aco_cuda_v3_ref
-[ 30%] Linking CXX executable bin/aco_cuda_v3_ref
-[ 30%] Built target aco_cuda_v3_ref
-Scanning dependencies of target aco_seq_ref
-[ 40%] Building CXX object CMakeFiles/aco_seq_ref.dir/src/aco_seq.cpp.o
-[ 50%] Building CXX object CMakeFiles/aco_seq_ref.dir/src/aco_seq_algorithm.cpp.o
-[ 60%] Building CXX object CMakeFiles/aco_seq_ref.dir/src/Randoms.cpp.o
-[ 70%] Linking CXX executable bin/aco_seq_ref
-[ 70%] Built target aco_seq_ref
-[ 80%] Building NVCC (Device) object CMakeFiles/aco_cuda_v2_ref.dir/src/aco_cuda_v2_ref_generated_aco_v2_cuda_algorithm.cu.o
-[ 90%] Building NVCC (Device) object CMakeFiles/aco_cuda_v2_ref.dir/src/aco_cuda_v2_ref_generated_aco_v2_cuda.cu.o
-Scanning dependencies of target aco_cuda_v2_ref
-[100%] Linking CXX executable bin/aco_cuda_v2_ref
-[100%] Built target aco_cuda_v2_ref
-run; iterations; problem; colony size; Fitness; Total Time 
-Problem, Block-Size,  Ants, Time,  Fitness 
-
  0, 256, 1024, 0.040527 , 21 
  0, 256, 1024, 0.040524 , 21 
  0, 256, 1024, 0.040526 , 21 
@@ -109,10 +17,7 @@ Problem, Block-Size,  Ants, Time,  Fitness
  0, 256, 8192, 0.150171 , 21 
  0, 256, 8192, 0.150267 , 21 
  0, 256, 8192, 0.150264 , 21 
- 0, 256, 8192, 0.150191 , 21 
- End Of Execution 
-Problem, Block-Size,  Ants, Time,  Fitness 
-
+ 0, 256, 8192, 0.150191 , 21   
  1, 256, 1024, 0.313539 , 66 
  1, 256, 1024, 0.313755 , 66 
  1, 256, 1024, 0.313697 , 66 
@@ -132,10 +37,7 @@ Problem, Block-Size,  Ants, Time,  Fitness
  1, 256, 8192, 1.896471 , 66 
  1, 256, 8192, 1.896978 , 66 
  1, 256, 8192, 1.897014 , 66 
- 1, 256, 8192, 1.896496 , 66 
- End Of Execution 
-Problem, Block-Size,  Ants, Time,  Fitness 
-
+ 1, 256, 8192, 1.896496 , 66   
  2, 256, 1024, 1.680613 , 134 
  2, 256, 1024, 1.680411 , 134 
  2, 256, 1024, 1.679956 , 134 
@@ -155,10 +57,7 @@ Problem, Block-Size,  Ants, Time,  Fitness
  2, 256, 8192, 8.565716 , 134 
  2, 256, 8192, 8.566954 , 134 
  2, 256, 8192, 8.564778 , 134 
- 2, 256, 8192, 8.565664 , 134 
- End Of Execution 
-Problem, Block-Size,  Ants, Time,  Fitness 
-
+ 2, 256, 8192, 8.565664 , 134   
  3, 256, 1024, 4.014610 , 201 
  3, 256, 1024, 4.014015 , 201 
  3, 256, 1024, 4.016175 , 201 
@@ -178,10 +77,7 @@ Problem, Block-Size,  Ants, Time,  Fitness
  3, 256, 8192, 17.665205 , 201 
  3, 256, 8192, 17.656858 , 201 
  3, 256, 8192, 17.664282 , 201 
- 3, 256, 8192, 17.660243 , 201 
- End Of Execution 
-Problem, Block-Size,  Ants, Time,  Fitness 
-
+ 3, 256, 8192, 17.660243 , 201   
  4, 256, 1024, 6.274636 , 269 
  4, 256, 1024, 6.274684 , 269 
  4, 256, 1024, 6.274847 , 269 
@@ -201,10 +97,7 @@ Problem, Block-Size,  Ants, Time,  Fitness
  4, 256, 8192, 31.897293 , 269 
  4, 256, 8192, 31.916598 , 269 
  4, 256, 8192, 31.909349 , 269 
- 4, 256, 8192, 31.900868 , 269 
- End Of Execution 
-Problem, Block-Size,  Ants, Time,  Fitness 
-
+ 4, 256, 8192, 31.900868 , 269   
  5, 256, 1024, 13.410048 , 338 
  5, 256, 1024, 13.410690 , 338 
  5, 256, 1024, 13.410506 , 338 
@@ -225,4 +118,3 @@ Problem, Block-Size,  Ants, Time,  Fitness
  5, 256, 8192, 56.703715 , 337 
  5, 256, 8192, 56.712988 , 337 
  5, 256, 8192, 56.719179 , 337 
- End Of Execution 
