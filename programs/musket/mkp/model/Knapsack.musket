@@ -1,0 +1,243 @@
+
+#config PLATFORM GPU CUDA
+#config PROCESSES 1
+#config CORES 1
+#config GPUS 1
+#config MODE debug
+
+const int global_object_values = 6;
+const int global_n_constraints = 10;
+const double global_Q = 0.0;
+
+array<int, 6, dist, yes> object_values;
+array<int, 60, dist, yes> dimensions_values;
+array<int, 60, dist, yes> constraints_max_values;
+array<int, 60, dist, yes> dimension_values;
+array<int, 10, dist, yes> constraint_max_values;
+array<int, 6144, dist, yes> d_ant_solutions = {-1};
+array<int, 6, dist, yes> d_best_solution;
+array<int, 6144, dist, yes> d_ant_available_objects = {1};
+array<double, 36, dist, yes> d_pheromones; // TODO fill with kernel
+array<double, 36, dist, yes> d_delta_phero = {0.0};
+array<double, 6144, dist, yes> d_probabilities;
+array<int, 10240, dist, yes> d_free_space; // todo fill with kernel
+array<double, 6144, dist, yes> d_eta;
+array<double, 6144, dist, yes> d_tau;
+array<int, 1024, dist, yes> d_ant_fitness;
+
+
+double initPheros(int i, double y){
+	return 1.2;
+}
+
+int initFreeSpace(int n_ants, int i, int y){
+	int j = (int) i % n_ants;
+	return constraint_max_values[j];
+}
+
+int generate_solutions(int d_n_objects, int d_n_constraints, int i, int value){
+	int ant_index = i;
+	//int solution_index = ant_index * d_n_objects;
+
+	//Solution related Variables
+	int value_object_j = 0;
+	double pheromone_to_object_j = 0.0;
+	int size_i_object_j = 0;
+	double average_tightness_object_j = 0.0;
+	int free_space_i = 0;
+	double eta = 0.0;
+	double tau = 0.0;
+	double eta_tau_sum = 0.0;
+	int fitness = 0;
+
+	bool is_too_big = false;
+	bool is_possible = false;
+	int select_index = 0;
+
+	//iteration to add objects
+	//The maximum size of a solution is the number of objects
+	//The solution stops iterating in the case no objects fit anymore.
+	for(int step = 0 ; step < d_n_objects ; step++){
+
+		eta_tau_sum = 0.0;
+		is_possible = false;
+
+		//Iterate over objects to calculate probability of chosing it as next
+		for(int object_j = 0 ; object_j < d_n_objects ; object_j++){
+			//Check if objects are available
+			if(d_ant_available_objects[ant_index * d_n_objects + object_j] == 1){
+
+				value_object_j = object_values[object_j];
+				pheromone_to_object_j = d_pheromones[step * d_n_objects + object_j];
+
+				//Calculate average tightness -> Equation 4
+				average_tightness_object_j = 0.0;
+				is_too_big = false;
+
+				for(int ii = 0; ii < d_n_constraints ; ii++){
+					size_i_object_j = dimensions_values[i*d_n_objects + object_j];
+					free_space_i = d_free_space[ant_index*d_n_constraints + i];
+
+					if(size_i_object_j <= free_space_i){
+						if(free_space_i == 0.0){
+							average_tightness_object_j = 1.0 + average_tightness_object_j;
+						}else{
+							average_tightness_object_j = (size_i_object_j / free_space_i) + average_tightness_object_j;
+						}
+					}else{
+						//Object is to big and probability shall be 0
+						is_too_big = true;
+					}
+				}
+
+				if(!is_too_big){
+					average_tightness_object_j = (double) (average_tightness_object_j / d_n_constraints);
+
+					eta = mkt::pow((value_object_j / average_tightness_object_j), 1);
+					tau = mkt::pow(pheromone_to_object_j, 1);
+					
+					eta_tau_sum = (eta * tau) + eta_tau_sum;
+
+					d_eta[ant_index*d_n_objects + object_j] = eta;
+					d_tau[ant_index*d_n_objects + object_j] = tau;
+
+					is_possible = true;
+
+				}else{ //Don't Fit -> Probability = 0;
+					d_eta[ant_index*d_n_objects + object_j] = 0.0;
+					d_tau[ant_index*d_n_objects + object_j] = 0.0;
+				}
+			}else{ //Not available -> Probability = 0;
+				d_eta[ant_index*d_n_objects + object_j] = 0.0;
+				d_tau[ant_index*d_n_objects + object_j] = 0.0;
+			}
+		}
+
+		if(is_possible){
+			//Finish Probability calculations using eta and tau
+			for(int object_j = 0 ; object_j < d_n_objects ; object_j++){
+				d_probabilities[ant_index * d_n_objects + object_j] =
+						(d_eta[ant_index*d_n_objects + object_j] * d_tau[ant_index*d_n_objects + object_j]) / eta_tau_sum;
+			}
+
+			//Add new object in a probabilistic manner
+			//curand_uniform(&d_rand_states_ind[ant_index])
+			double random = 0.0;
+			select_index = 0;
+			int selected_object = 0;
+			double sum = 0.0;
+			double prob = 0.0;
+		
+			for (int whilei = 0; whilei > 0; whilei++) {
+				prob = d_probabilities[ant_index*d_n_objects+select_index];
+				if(prob > 0.0){
+					sum = sum + prob;
+					selected_object = select_index;
+				}
+
+				select_index = select_index + 1;
+				if (sum <= random) {
+					if ( select_index < d_n_objects){
+						whilei = -1;
+					}
+				}
+			}
+
+			d_ant_solutions[ant_index*d_n_objects + step] = selected_object;
+			d_ant_available_objects[ant_index*d_n_objects + selected_object] = 0;
+
+			for(int j = 0 ; j < d_n_constraints ; j++){
+				d_free_space[ant_index*d_n_constraints+j] = d_free_space[ant_index*d_n_constraints+j] - dimensions_values[j*d_n_objects + selected_object];
+			}
+
+			fitness = object_values[selected_object] + fitness;
+		}else{
+			d_ant_solutions[ant_index*d_n_objects + step] = -1;
+		}
+	}
+
+	//Reset Free Spaces
+	for(int j = 0 ; j < d_n_constraints; j++){
+		d_free_space[ant_index* d_n_constraints + j] = constraint_max_values[j];
+	}
+	for(int j = 0 ; j < d_n_objects; j++){
+		d_ant_available_objects[ant_index* d_n_objects + j] = 1;
+	}
+	
+	return fitness;
+	
+}
+
+double evaporate(double evaporation, int i, double value){
+	return value * evaporation;
+}
+
+int pheromone_deposit(int n_objects, int n_ants, int iindex, int pherovalue) {
+	
+	int ant_index = iindex % n_objects;
+	int i = iindex % n_ants;
+	
+	int object_i = 0;
+	double delta_phero = 0.0;
+	int value = 0;
+	
+	object_i = d_ant_solutions[ant_index * n_objects + i];
+	if(object_i != -1){
+		value = object_values[object_i];
+		delta_phero = (double) global_Q * value;
+		d_pheromones[(int)(i * n_objects + object_i)] = delta_phero;
+	}
+	//Restart Solutions
+	return -1;
+}
+
+int update_bestroute(int bestRoute,int n_ants, int n_objects,  int Index, int value) {
+	int k = Index;		
+	int ant = 0;
+	for(int j = 0 ; j<n_ants; j++){
+		if(d_ant_fitness[k] == bestRoute){
+			ant = j;
+		}
+	}
+
+	return d_ant_solutions[ant*n_objects + k];
+}
+
+main{
+	// Set bestroute high so it is fastly replaced by the number for an existing route
+	mkt::roi_start();	
+	int n_iterations = 5;
+	double evaporation = 0.5;
+	// =======================Start Variables and Read Input Files==========================================
+	int n_objects = 0;
+	int n_constraints = 0;
+	double Q = 0.0;
+	
+	double best_fitness = 0.0; //Maximization Problem
+
+    //Execution Time measure
+	double mean_times = 0.0;
+	int n_ants = 1024;
+
+	d_pheromones.mapIndexInPlace(initPheros());
+	d_free_space.mapIndexInPlace(initFreeSpace(n_ants));
+
+	int iteration = 0;
+	for(int ii = 0 ; ii < n_iterations; ii++){
+		//Generate Solutions
+		d_ant_fitness.mapIndexInPlace(generate_solutions(6, 10));
+	
+		//Check for best Fitness
+		best_fitness = d_ant_fitness.reduce(max);
+		d_ant_fitness.mapIndexInPlace(update_bestroute(best_fitness,n_ants, n_objects));
+		
+			
+		//Pheromone evaporation
+		d_pheromones.mapIndexInPlace(evaporate(evaporation));
+		//Pheromone deposit
+		d_ant_solutions.mapIndexInPlace(pheromone_deposit(n_objects, n_ants));
+	}
+
+	mkt::roi_end();
+	
+}
