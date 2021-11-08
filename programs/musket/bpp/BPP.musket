@@ -1,0 +1,235 @@
+#config PLATFORM GPU CUDA
+#config PROCESSES 1
+#config CORES 1
+#config GPUS 1
+#config MODE debug
+
+// Configs for ACO
+//array<int, 4, copy, yes> ants = {1024,2048,4096,8192};
+const int BETA = 1;
+const double EVAPORATION = 0.5;
+const int ALPHA = 1;
+const int BLOCK_SIZE = 32;
+const int Q = 32;
+// Params to change depending on problem
+const int itemtypes = 50;
+const int itemcount = 59;
+const int pheromone_matrix_size = 2500;
+const int antssquaredtimes = 12800;
+const int antssquaredcount = 15104;
+
+int bin_capacity = 1000;
+// 2* itemtype
+const int itemtypessquaredants = 51200;
+const int itemcountquaredants = 60416;
+
+// TODO Implement DeviceArray to use no option.
+array<double, pheromone_matrix_size, dist, yes> d_phero;
+array<double, 1024, dist, yes> d_fitness;
+array<double, itemtypessquaredants, dist, yes> d_probabilities;
+
+array<double, itemtypessquaredants, dist, yes> d_eta;
+array<double, itemtypessquaredants, dist, yes> d_tau;
+array<int, itemtypes, dist, yes> bpp_items_weight;
+array<int, itemtypes, dist, yes> bpp_items_quantity;
+array<int, itemtypessquaredants, dist, yes> copy_bpp_items_quantity;
+array<int, itemcountquaredants, dist, yes> d_bins;
+array<double, 1024, dist, yes> d_rand_states_ind;
+
+double packing_kernel(int itemtypess, int itemcountt, int BETA2, int bin_capacity2, int iindex, double y){
+	
+	int ant_index = iindex;
+
+	int object_bin_index = ant_index * itemcountt;
+	double bins_used = 0.0;
+
+	int bpp_items_prefix = (ant_index) * (itemtypess);
+    int object_weightmax = 0;
+    
+	int actual_bin_weight = 0;
+	int n_items_in_actual_bin = 0;
+	int possible_items_to_this_bin = 0;
+
+	//Start first bin -> Get heaviest item available and add to first bin
+	int object_index = 0;
+	int object_quantity = 0;
+	int new_object_weight = 0;
+ 	for (int i = 0; i < (itemtypess); i++) {
+    	copy_bpp_items_quantity[bpp_items_prefix + i] = bpp_items_quantity[i];
+
+    	new_object_weight = bpp_items_weight[i];
+    	object_quantity = copy_bpp_items_quantity[i];
+
+    	if(object_quantity > 0 and new_object_weight > object_weightmax){
+  			object_index = i;
+            object_weightmax = new_object_weight;
+    	}
+  	}
+
+	d_bins[ant_index* itemtypess] = object_index;
+	copy_bpp_items_quantity[bpp_items_prefix + object_index] = copy_bpp_items_quantity[bpp_items_prefix + object_index] - 1;
+	n_items_in_actual_bin = n_items_in_actual_bin + 1;
+	actual_bin_weight += object_weightmax;
+	bins_used = bins_used + 1;
+	
+	int weight_object_j = 0;
+	int object_i = 0;
+	int quantity_object_j = 0;
+	//Loop to build complete bins
+	for (int ii = 0; ii < (itemcountt - 1); ii++) {
+		double eta_tau_sum = 0.0;
+		possible_items_to_this_bin = 0;
+		
+		for (int j = 0; j < itemtypess; j++) {
+			d_eta[bpp_items_prefix+j] = 0.0;
+			d_tau[bpp_items_prefix+j] = 0.0;
+			d_probabilities[bpp_items_prefix+j] = 0.0;
+			
+			weight_object_j = bpp_items_weight[j];
+			quantity_object_j = copy_bpp_items_quantity[bpp_items_prefix +j];
+			if(quantity_object_j > 0 and weight_object_j < (bin_capacity2-actual_bin_weight)){
+				for(int k = 0 ; k < n_items_in_actual_bin ; k++){
+					object_i = d_bins[object_bin_index+ii-k];
+					d_eta[object_bin_index+j] += d_phero[(object_i*itemtypess) + j];
+				}
+				
+				d_eta[bpp_items_prefix+j] = (double) (d_eta[bpp_items_prefix+j] / n_items_in_actual_bin);
+				d_tau[bpp_items_prefix+j] = (double) mkt::pow(weight_object_j, BETA);
+				eta_tau_sum += d_eta[bpp_items_prefix+j] * d_tau[bpp_items_prefix+j];
+				possible_items_to_this_bin = possible_items_to_this_bin + 1;
+			}
+		}
+		if(possible_items_to_this_bin > 0){
+			for (int j = 0; j < itemtypess; j++) {
+				d_probabilities[object_bin_index+j] = (d_eta[object_bin_index+j] * d_tau[object_bin_index+j]) / eta_tau_sum;
+			}
+			eta_tau_sum = 0.0;
+			
+			double random = 0.0; // curand_uniform(&rand_states[ant_index]);
+			int select_index = 0;
+			int object_j = 0;
+			double sum = 0.0;
+			double prob = 0.0;
+			while (sum <= random and select_index < itemtypess){ // && (select_index < itemtypess)
+				prob = d_probabilities[bpp_items_prefix+select_index];//(bpp_items_prefix+select_index);
+	            if(prob > 0.0){
+	              sum += prob;
+	              object_j = select_index;
+	            }
+
+            	select_index = select_index + 1;
+	        }
+
+			d_bins[ant_index*itemtypess+ii+1] = object_j;
+
+			weight_object_j = bpp_items_weight[object_j];
+			actual_bin_weight += weight_object_j;
+
+			copy_bpp_items_quantity[bpp_items_prefix + object_j] = copy_bpp_items_quantity[bpp_items_prefix + object_j] - 1;
+			n_items_in_actual_bin = n_items_in_actual_bin + 1;
+
+		}else{
+
+			bins_used = bins_used + 1;
+
+            object_index = 0;
+            object_weightmax = 0;
+
+			for(int k = 0 ; k < itemtypess ; k++){
+				object_quantity = copy_bpp_items_quantity[bpp_items_prefix + k];
+				new_object_weight = bpp_items_weight[k];
+
+				if(object_quantity > 0 and new_object_weight > object_weightmax){
+					object_index = k;
+                	object_weightmax = (new_object_weight);
+				}
+			}
+
+			copy_bpp_items_quantity[bpp_items_prefix + object_index] = copy_bpp_items_quantity[bpp_items_prefix + object_index] - 1;
+			d_bins[ant_index*itemtypess+ii+1] = object_index;
+			n_items_in_actual_bin = 1;
+          	actual_bin_weight = (object_weightmax);
+		}
+		}
+		return bins_used;
+}
+
+double evaporation_kernel(int itemtypess, double EVAPORATION2, int iindex, double y) {
+
+	//Evaporation Rate
+	double result = 0.0;
+	double RO = EVAPORATION2;
+	if(iindex % itemtypess != 0) {
+		result = (1 - RO) * d_phero[iindex];
+	}
+	return result;
+
+}
+
+double update_pheromones_kernel(int itemcountt, int itemtypee, int bin_capacity2, int iindex, double value){
+
+	int ant_index = iindex;
+
+	double ant_fitness = d_fitness[ant_index] * 1.0;
+	int actual_bin_weight = 0;
+	int actual_bin_object_index = 0;
+	int actual_bin_n_objects = 0;
+
+	for(int i = 0 ; i < itemcountt ; i++){
+
+		int object_i = d_bins[(ant_index * itemcountt) + i];
+        int object_weight = bpp_items_weight[object_i];
+
+		if(actual_bin_weight + object_weight <= bin_capacity2){
+			actual_bin_n_objects = actual_bin_n_objects + 1;
+			actual_bin_weight = actual_bin_weight + object_weight;
+		}else{
+			//update pheromones between items from actual bin index -> n-objects
+			for(int j = 0; j<actual_bin_n_objects; j++){
+				for(int k = j+1; k<actual_bin_n_objects; k++){
+
+					object_i = d_bins[ant_index*itemcountt+actual_bin_object_index+j];
+					int object_j = d_bins[ant_index*itemcountt+actual_bin_object_index+k];
+
+					double delta_pheromone =  Q / (d_fitness[ant_index] * 1.0);
+
+					d_phero[object_i * itemtypee + object_j] =  delta_pheromone + d_phero[object_i * itemtypee + object_j];
+					d_phero[object_j * itemtypee + object_i] =  delta_pheromone + d_phero[object_j * itemtypee + object_i];
+				}
+			}
+
+			//Start new bin count
+			actual_bin_n_objects = 1;
+			actual_bin_weight = object_weight;
+			actual_bin_object_index = i;
+		}
+	}
+	return value;
+}
+
+main{
+	// Set bestroute high so it is fastly replaced by the number for an existing route
+	mkt::roi_start();
+
+	double best_fitness = 999999.9;
+
+    //Execution Time measure
+	double mean_times = 0.0;
+	int n_iterations = 5;
+	//START iterations
+	for (int iterate = 0; iterate < n_iterations; iterate++){
+
+		//START clock
+		mkt::roi_start();
+	
+		d_fitness.mapIndexInPlace(packing_kernel(itemtypes, itemcount, BETA, bin_capacity));
+		d_phero.mapIndexInPlace(evaporation_kernel(itemtypes, EVAPORATION));
+		d_fitness.mapIndexInPlace(update_pheromones_kernel(itemcount,itemtypes, bin_capacity));
+		double new_best_fitness = d_fitness.reduce(min);
+		if (new_best_fitness < best_fitness){
+			best_fitness = new_best_fitness;
+		}
+		mkt::roi_end();
+	}
+	mkt::roi_end();
+}

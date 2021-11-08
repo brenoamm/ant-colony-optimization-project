@@ -1,0 +1,4 @@
+/home/schredder/Programs/clion-2020.1.1/bin/cmake/linux/bin/cmake -G "CodeBlocks - Unix Makefiles" /home/schredder/Research/Musket/src-gen/BPP/CUDA
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/schredder/Research/Musket/src-gen/BPP/CUDA
