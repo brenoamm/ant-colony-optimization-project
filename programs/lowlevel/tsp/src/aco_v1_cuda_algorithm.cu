@@ -348,44 +348,39 @@ __global__ void route_kernel2(int n_cities, int* routes, double* c_phero, double
 	}
 }
 
-__global__ void update_pheromones_kernel(int* NUMBEROFANTS, int* NUMBEROFCITIES, int* ROUTES, double* c_phero, double* DELTAPHEROMONES, double* DIST, double* routes_distance, double* bestRoute, int* d_best_sequence) {
+__global__ void update_pheromones_kernel(int* numberofants, int* numberofcities, int* ROUTES, double* c_phero, double* DELTAPHEROMONES, double* DIST, double* routes_distance, double* bestRoute, int* d_best_sequence) {
 
-//	printf("\n\n\n updatePHEROMONES: ");
-
-	int Q = 11340;
+    int Q = 11340;
 	double RO = 0.5;
 
-	for (int k=0; k<NUMBEROFANTS[0]; k++) {
+	for (int k=0; k < numberofants[0]; k++) {
 
-		double rlength = d_length(k, NUMBEROFCITIES[0], ROUTES, DIST);
+		double rlength = d_length(k, numberofcities[0], ROUTES, DIST);
 		routes_distance[k] = rlength;
+		for (int r=0; r < numberofcities[0] - 1; r++) {
 
-//		printf("\n Distances : %f", rlength);
+			int cityi = ROUTES[k * numberofcities[0] + r];
+			int cityj = ROUTES[k * numberofcities[0] + r + 1];
 
-		for (int r=0; r < NUMBEROFCITIES[0]-1; r++) {
-
-			int cityi = ROUTES[k * NUMBEROFCITIES[0] + r];
-			int cityj = ROUTES[k * NUMBEROFCITIES[0] + r + 1];
-
-			DELTAPHEROMONES[cityi* NUMBEROFCITIES[0] + cityj] += Q / rlength;
-			DELTAPHEROMONES[cityj* NUMBEROFCITIES[0] + cityi] += Q / rlength;
+			DELTAPHEROMONES[cityi * numberofcities[0] + cityj] += Q / rlength;
+			DELTAPHEROMONES[cityj * numberofcities[0] + cityi] += Q / rlength;
 		}
 
 		if(routes_distance[k] < bestRoute[0]){
 			bestRoute[0] = routes_distance[k];
-			for (int count=0; count < NUMBEROFCITIES[0]; count++) {
-				d_best_sequence[count] = ROUTES[k * NUMBEROFCITIES[0]+count];
+			for (int count=0; count < numberofcities[0]; count++) {
+				d_best_sequence[count] = ROUTES[k * numberofcities[0] + count];
 			}
 		}
 	}
 
-	for (int i=0; i<NUMBEROFCITIES[0]; i++) {
-		for (int j=0; j<NUMBEROFCITIES[0]; j++) {
-			c_phero[i * NUMBEROFCITIES[0] + j] = (1 - RO) * c_phero[i * NUMBEROFCITIES[0] +j] + DELTAPHEROMONES[i * NUMBEROFCITIES[0] +j];
-			DELTAPHEROMONES[i * NUMBEROFCITIES[0] +j] = 0.0;
+	for (int i=0; i < numberofcities[0]; i++) {
+		for (int j=0; j < numberofcities[0]; j++) {
+			c_phero[i * numberofcities[0] + j] = (1 - RO) * c_phero[i * numberofcities[0] + j] + DELTAPHEROMONES[i * numberofcities[0] + j];
+			DELTAPHEROMONES[i * numberofcities[0] + j] = 0.0;
 
-			c_phero[j * NUMBEROFCITIES[0] + i] = (1 - RO) * c_phero[j * NUMBEROFCITIES[0] +i] + DELTAPHEROMONES[j * NUMBEROFCITIES[0] +i];
-			DELTAPHEROMONES[j * NUMBEROFCITIES[0] +i] = 0.0;
+			c_phero[j * numberofcities[0] + i] = (1 - RO) * c_phero[j * numberofcities[0] + i] + DELTAPHEROMONES[j * numberofcities[0] + i];
+			DELTAPHEROMONES[j * numberofcities[0] + i] = 0.0;
 		}
 	}
 

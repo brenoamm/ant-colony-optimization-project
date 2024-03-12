@@ -4,6 +4,8 @@
 #include <ctime>
 #include <boost/program_options.hpp>
 #include "aco_v3_cuda_algorithm.cuh"
+#include "timer.h"
+#include "mpi.h"
 
 #define CUDA_ERROR_CHECK
 
@@ -49,10 +51,10 @@ int main(int argc, char *argv[]){
 		printf("\n\n 0000001- cudaCheckError() failed at : %s \n", cudaGetErrorString( err ) );
 	}
 
-	printf("\n ACO - Begin Of Execution");
+	//printf("\n ACO - Begin Of Execution");
 
 	if (!handle_program_options(argc, argv)) {
-		printf("\n Cant handle anything...");
+		//printf("\n Cant handle anything...");
 	    return 0;
 	}
 
@@ -62,7 +64,12 @@ int main(int argc, char *argv[]){
 	int runs = g_prog_options["runs"].as<int>();
 	int iterations = g_prog_options["iterations"].as<int>();
 	int problem = g_prog_options["problem"].as<int>();
-
+    int num_total_procs, proc_id;
+#ifdef MPI_VERSION
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &num_total_procs);
+    MPI_Comm_rank(MPI_COMM_WORLD, &proc_id);
+#endif
 
 	double mean_dist = 0.0;
 	double mean_times = 0.0;
@@ -72,32 +79,30 @@ int main(int argc, char *argv[]){
 	double actual_execution_time;
 
 	int ant[] = {1024, 2048, 4096, 8192};
-
-	for(int setup = 0 ; setup < 4; setup++){
-
+    //printf(" Reading map: %d \n", problem);
+	for(int setup : ant){
 		mean_dist = 0;
 		mean_times = 0;
+		//printf("\n ----------------------------------------------------------\n");
+		//printf(" Starting Test %i with %i ants\n", setup, ant[setup]);
+        printf("\n%d;", problem);
 
-		printf("\n\n\n Starting Test %i with %i ants", setup, ant[setup]);
-
-		for(int i = 0 ; i < runs; i++){
-
-			actual_execution_time = 0.0;
-			start = std::clock();
-
-			mean_dist += run_aco(ant[setup], iterations, problem);
-
-			actual_execution_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-			mean_times += actual_execution_time;
+		for (int i = 0 ; i < runs; i++) {
+			/*actual_execution_time = 0.0;
+			start = std::clock();*/
+            msl::Timer *timer = new msl::Timer();
+			mean_dist += run_aco(setup, iterations, problem);
+            actual_execution_time = timer->stop();
+			//actual_execution_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+			//mean_times += actual_execution_time;
 		}
+        // printf("%f;", actual_execution_time/runs);
 
-		printf("\n\n Elapsed Time: %f", mean_times/runs);
-				printf("\n Distance: %f", mean_dist/runs);
-				printf("\n Ending Testes %i with %i ants problem %i", setup, ant[setup], problem);
+		//printf("%f;", mean_times/runs);
+        printf("Mean Dist %f;", mean_dist/runs);
+		//printf("\n Ending Testes %i with %i ants problem %i", setup, ant[setup], problem);
 	}
-
-
-	printf("\n End Of Execution");
+	//printf("\n End Of Execution\n");
 
    return 0;
 }

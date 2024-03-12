@@ -5,7 +5,7 @@ project(aco_low_level)
 # required macros
 include(CheckCXXCompilerFlag)
 enable_testing()
-
+find_package(MPI REQUIRED)
 
 # config status messages
 message(STATUS "Host System: " ${CMAKE_HOST_SYSTEM})
@@ -30,6 +30,7 @@ message(STATUS "mpi compiler: " ${MPI_CXX_COMPILER})
 message(STATUS "mpi compile flags: " ${MPI_CXX_COMPILE_FLAGS})
 message(STATUS "mpi link flags: " ${MPI_CXX_LINK_FLAGS})
 message(STATUS "mpi libraries: " ${MPI_CXX_LIBRARIES})
+message(STATUS "mpi include paths: " ${MPI_CXX_INCLUDE_PATH})
 
 find_package(OpenMP)
 
@@ -181,7 +182,7 @@ if(Boost_FOUND)
 add_executable(aco_openmp_v2_ref ${PROJECT_SOURCE_DIR}/src/aco_openmp_v2.cpp ${PROJECT_SOURCE_DIR}/src/aco_openmp_v2_algorithm.cpp)
     	target_compile_options(aco_openmp_v2_ref PUBLIC ${OpenMP_CXX_FLAGS} $<$<CONFIG:Debug>:${COMMON_DEBUG_COMPILER_OPTIONS}> $<$<CONFIG:Release>:${COMMON_RELEASE_COMPILER_OPTIONS}> $<$<CONFIG:RelWithDebInfo>:		${COMMON_RELWITHDEBINFO_COMPILER_OPTIONS}> $<$<CONFIG:MinSizeRel>:${COMMON_MINSIZEREL_COMPILER_OPTIONS}>)
     	target_compile_features(aco_openmp_v2_ref PUBLIC cxx_auto_type cxx_lambdas cxx_nullptr cxx_uniform_initialization)
-    	target_include_directories(aco_openmp_v2_ref PUBLIC ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
+    	target_include_directories(aco_openmp_v2_ref PUBLIC ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include ${MPI_CXX_INCLUDE_PATH}>)
     	target_link_libraries(aco_openmp_v2_ref ${Boost_LIBRARIES} -fopenmp gomp rt)
   endif(BUILD_CPU)
 
@@ -196,11 +197,13 @@ target_link_libraries(aco_cuda_v1_ref ${Boost_LIBRARIES} rt)
 
 CUDA_ADD_EXECUTABLE(aco_cuda_v2_ref ${PROJECT_SOURCE_DIR}/src/aco_v2_cuda.cu ${PROJECT_SOURCE_DIR}/src/aco_v2_cuda_algorithm.cu OPTIONS ${GPU_COMPILER_OPTIONS} DEBUG ${GPU_COMPILER_OPTIONS_DEBUG} ${GPU_HOST_COMPILER_OPTIONS_DEBUG} RELEASE ${GPU_COMPILER_OPTIONS_RELEASE} ${GPU_HOST_COMPILER_OPTIONS_RELEASE} RELWITHDEBINFO ${GPU_COMPILER_OPTIONS_RELWITHDEBINFO} ${GPU_HOST_COMPILER_OPTIONS_RELWITHDEBINFO} MINSIZEREL ${GPU_COMPILER_OPTIONS_MINSIZEREL} ${GPU_HOST_COMPILER_OPTIONS_MINSIZEREL}) 
 target_include_directories(aco_cuda_v2_ref PUBLIC ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
-target_link_libraries(aco_cuda_v2_ref ${Boost_LIBRARIES} rt)
+target_link_libraries(aco_cuda_v2_ref ${Boost_LIBRARIES} rt ${MPI_CXX_LINK_FLAGS} ${MPI_CXX_LIBRARIES})
+# target_compile_options(aco_cuda_v2_ref ${MPI_CXX_COMPILE_FLAGS} ${COMMON_COMPILER_OPTIONS})
 
 CUDA_ADD_EXECUTABLE(aco_cuda_v3_ref ${PROJECT_SOURCE_DIR}/src/aco_v3_cuda.cu ${PROJECT_SOURCE_DIR}/src/aco_v3_cuda_algorithm.cu OPTIONS ${GPU_COMPILER_OPTIONS} DEBUG ${GPU_COMPILER_OPTIONS_DEBUG} ${GPU_HOST_COMPILER_OPTIONS_DEBUG} RELEASE ${GPU_COMPILER_OPTIONS_RELEASE} ${GPU_HOST_COMPILER_OPTIONS_RELEASE} RELWITHDEBINFO ${GPU_COMPILER_OPTIONS_RELWITHDEBINFO} ${GPU_HOST_COMPILER_OPTIONS_RELWITHDEBINFO} MINSIZEREL ${GPU_COMPILER_OPTIONS_MINSIZEREL} ${GPU_HOST_COMPILER_OPTIONS_MINSIZEREL}) 
-target_include_directories(aco_cuda_v3_ref PUBLIC ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
-target_link_libraries(aco_cuda_v3_ref ${Boost_LIBRARIES} rt)
+target_include_directories(aco_cuda_v3_ref PUBLIC ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include ${MPI_CXX_INCLUDE_PATH})
+target_link_libraries(aco_cuda_v3_ref ${Boost_LIBRARIES} rt ${MPI_CXX_LINK_FLAGS} ${MPI_CXX_LIBRARIES})
+# target_compile_options(aco_cuda_v3_ref ${MPI_CXX_COMPILE_FLAGS} ${COMMON_COMPILER_OPTIONS})
 
 CUDA_ADD_EXECUTABLE(mknap_aco_cuda_ref ${PROJECT_SOURCE_DIR}/src/mknap_aco_cuda.cu ${PROJECT_SOURCE_DIR}/src/mknap_aco_cuda_algorithm.cu OPTIONS ${GPU_COMPILER_OPTIONS} DEBUG ${GPU_COMPILER_OPTIONS_DEBUG} ${GPU_HOST_COMPILER_OPTIONS_DEBUG} RELEASE ${GPU_COMPILER_OPTIONS_RELEASE} ${GPU_HOST_COMPILER_OPTIONS_RELEASE} RELWITHDEBINFO ${GPU_COMPILER_OPTIONS_RELWITHDEBINFO} ${GPU_HOST_COMPILER_OPTIONS_RELWITHDEBINFO} MINSIZEREL ${GPU_COMPILER_OPTIONS_MINSIZEREL} ${GPU_HOST_COMPILER_OPTIONS_MINSIZEREL}) 
 target_include_directories(mknap_aco_cuda_ref PUBLIC ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)

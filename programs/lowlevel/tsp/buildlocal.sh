@@ -8,9 +8,9 @@ mkdir -p ../build/${BUILDTYPE} && \
 cd ../build/${BUILDTYPE} && \
 
 if [ "${BUILDTYPE}" == "Debug" ]; then
-	cmake -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug ../../source/
+	cmake -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug ../../tsp/
 else
-	cmake -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Release ../../source/
+	cmake -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Release ../../tsp/
 fi
 
 make

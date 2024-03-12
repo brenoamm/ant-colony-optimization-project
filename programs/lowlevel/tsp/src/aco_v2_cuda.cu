@@ -4,7 +4,7 @@
 #include <ctime>
 #include <boost/program_options.hpp>
 #include "aco_v2_cuda_algorithm.cuh"
-
+#include "timer.h"
 namespace bpo = boost::program_options;
 
 bpo::variables_map g_prog_options;
@@ -13,83 +13,68 @@ bpo::variables_map g_prog_options;
 //         Name:  init_program_options
 //  Description: Initializes program options
 // =====================================================================================
-bool handle_program_options(int argc, char *argv[]) {
-  bpo::options_description desc { "Options" };
-  desc.add_options()("help,h", "help screen")
-
-  ("runs,r", bpo::value<int>()->default_value(1), "# of runs")
-
-//  ("ants,a", bpo::value<int>()->default_value(128), "# of particles")
-
-  ("iterations,i", bpo::value<int>()->default_value(5), "# of iterations")
-
-  ("problem,p", bpo::value<int>()->default_value(1), "# problem id");
-
-  //1 - Djbouti , 2 - Luxemburg , 3 - Catar
-
-  //("debug_messages,m", bpo::bool_switch(&debug_msg)->default_value(false),
-  //  "print debug messages to console");
-
-  store(parse_command_line(argc, argv, desc), g_prog_options);
-  notify(g_prog_options);
-  if (g_prog_options.count("help")) {
-    std::cout << desc << '\n';
-    return false;
-  }
-  return true;
+void exitWithUsage() {
+    std::cerr
+            << "Usage: ./gassimulation_test [-g <nGPUs>] [-n <iterations>] [-i <importFile>] [-e <exportFile>] [-t <threads>] [-c <cities>] [-a <ants>] [-r <runs>]"
+            << "Default 1 GPU 1 Iteration No import File No Export File threads omp_get_max_threads cities 10 random generated cities ants 16 runs 1" <<std::endl;
+    exit(-1);
 }
-
+int getIntArg(char *s, bool allowZero = false) {
+    int i = std::atoi(s);
+    if (i < 0 || (i == 0 && !allowZero)) {
+        exitWithUsage();
+    }
+    return i;
+}
 int main(int argc, char *argv[]){
 
-	printf("\n ACO - Begin Of Execution");
+	//printf("\n ACO - Begin Of Execution");
+    int num_total_procs, proc_id;
+#ifdef MPI_VERSION
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &num_total_procs);
+    MPI_Comm_rank(MPI_COMM_WORLD, &proc_id);
+#endif
+    int iterations = 1, runs = 1;
+    std::string problem;
 
-	if (!handle_program_options(argc, argv)) {
-		printf("\n Cant handle anything...");
-	    return 0;
-	}
-
-//	printf("\n Reading variables \n");
-
-//	int ants = g_prog_options["ants"].as<int>();
-	int runs = g_prog_options["runs"].as<int>();
-	int iterations = g_prog_options["iterations"].as<int>();
-	int problem = g_prog_options["problem"].as<int>();
-
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] != '-') {
+            exitWithUsage();
+        }
+        switch (argv[i++][1]) {
+            case 'i':
+                iterations = getIntArg(argv[i], true);
+                break;
+            case 'p':
+                problem = std::string(argv[i]);
+                break;
+            case 'r':
+                runs = (getIntArg(argv[i]));
+                break;
+            default:
+                exitWithUsage();
+        }
+    }
 
 	double mean_dist = 0.0;
-	double mean_times = 0.0;
 
-	std::clock_t start;
-	start = std::clock();
 	double actual_execution_time;
 
-	int ant[] = {1024, 2048, 4096, 8192};
+	int ant[] = {256, 512, 1024, 2048, 4096, 8192};
 
-	for(int setup = 0 ; setup < 4; setup++){
-
+	for(int setup : ant){
 		mean_dist = 0;
-		mean_times = 0;
-
-		printf("\n\n\n Starting Test %i with %i ants", setup, ant[setup]);
-
+		// printf("\n\n\n Starting Test %i with %i ants", setup, ant[setup]);
 		for(int i = 0 ; i < runs; i++){
-
-			actual_execution_time = 0.0;
-			start = std::clock();
-
-			mean_dist += run_aco(ant[setup], iterations, problem);
-
-			actual_execution_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-			mean_times += actual_execution_time;
+            auto *timer = new msl::Timer();
+			mean_dist += run_aco_v2(setup, iterations, problem);
+            actual_execution_time = timer->stop();
 		}
 
-		printf("\n\n Elapsed Time: %f", mean_times/runs);
-		printf("\n Distance: %f", mean_dist/runs);
-		printf("\n Ending Testes %i with %i ants problem %i", setup, ant[setup], problem);
+		printf("%f;", actual_execution_time);
+		printf("%f;\n", mean_dist/runs);
+		// printf("\n Ending Testes %i with %i ants problem %i", setup, ant[setup], problem);
 	}
-
-
-	printf("\n End Of Execution");
-
    return 0;
 }
