@@ -21,7 +21,7 @@ int n_cities = 0;
 int n_ants = 0;
 
 // ler o arquivo txt e inicia o pheromonio
-void readMap(double* coord, double* phero, int problem){
+void readMap(double* coord, double* phero, const std::string& problem){
 
 	readFile(coord, problem);
 
@@ -176,25 +176,41 @@ double pheroDeposit(int* sequence, double* dist, double* phero){
     return totalDist;
 }
 
-double run(int problem, int nants, int iterations, int runs, int n_threads)
+double run(const std::string&  problem, int nants, int iterations, int runs, int n_threads)
 {
 	randoms = new Randoms(15);
 
-//	printf("\n Problem : %i", problem);
-	//pre-processing
+    int nCities = 0;
 
-	switch (problem) {
-		case 1:
-			n_cities = 38; //Djbouti
-			break;
-		case 2:
-			n_cities = 980; //Luxemburg
-			break;
-		default:
-			n_cities = 194; //Catar
-		}
 
-//	printf("\n N cities : %i", n_cities);
+    if (problem == "djibouti") {
+        n_cities = 38;
+    } else if (problem == "luxembourg") {
+        n_cities = 980;
+    } else if (problem == "catar") {
+        n_cities = 194;
+    } else if (problem == "a280") {
+        n_cities = 280;
+    } else if (problem == "d198") {
+        n_cities = 198;
+    } else if (problem == "d1291") {
+        n_cities = 1291;
+    } else if (problem == "lin318") {
+        n_cities = 318;
+    } else if (problem == "pcb442") {
+        n_cities = 442;
+    } else if (problem == "pcb1173") {
+        n_cities = 1173;
+    } else if (problem == "pr1002") {
+        n_cities = 1002;
+    } else if (problem == "pr2392") {
+        n_cities = 2392;
+    } else if (problem == "rat783") {
+        n_cities = 783;
+    } else {
+        std::cout << "No valid import file provided. Please provide a valid import file." << std::endl;
+        exit(-1);
+    }
 
 	n_ants =  nants;
 
@@ -202,7 +218,7 @@ double run(int problem, int nants, int iterations, int runs, int n_threads)
 
     double bestAll = 9999999999999999.9;
     double a = omp_get_wtime();
-    srand(time(NULL));
+    srand(time(nullptr));
 
 	//int bestSequence[NCITY];
 	double bestRoute = 9999999999999999.9;

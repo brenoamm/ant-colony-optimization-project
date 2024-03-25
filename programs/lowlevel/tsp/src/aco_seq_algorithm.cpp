@@ -31,52 +31,39 @@ int *best_route;
 int *connections, *routes, *roulette_cities;
 double *cities, *pheromones, *delta_pheromones, *step_probabilities, *cities_distance;
 
-//Initialize ACO: Create graph, connect cities and generate pheromone matrix
-double init(int nAnts, int problem, int iterations) {
+double init(int nAnts, const std::string& problem, int iterations) {
 
-	int nCities = 0;
-
-	switch (problem) {
-	case 1:
-		nCities = 38; //Djbouti
-		break;
-	case 2:
-		nCities = 980; //Luxemburg
-		break;
-	case 3:
-		nCities = 194; //Catar.
-		break;
-	case 4:
-		nCities = 280;
-		break;
-	case 5:
-		nCities = 198;
-		break;
-	case 6:
-		nCities = 1291;
-		break;
-	case 7:
-		nCities = 318;
-		break;
-	case 8:
-		nCities = 442;
-		break;
-	case 9:
-		nCities = 1173;
-		break;
-	case 10:
-		nCities = 1002;
-		break;
-	case 11:
-		nCities = 2392;
-		break;
-	case 12:
-		nCities = 783;
-		break;
-	}
+	int ncities = 0;
+    if (problem == "djibouti") {
+        n_cities = 38;
+    } else if (problem == "luxembourg") {
+        n_cities = 980;
+    } else if (problem == "catar") {
+        n_cities = 194;
+    } else if (problem == "a280") {
+        n_cities = 280;
+    } else if (problem == "d198") {
+        n_cities = 198;
+    } else if (problem == "d1291") {
+        n_cities = 1291;
+    } else if (problem == "lin318") {
+        n_cities = 318;
+    } else if (problem == "pcb442") {
+        n_cities = 442;
+    } else if (problem == "pcb1173") {
+        n_cities = 1173;
+    } else if (problem == "pr1002") {
+        n_cities = 1002;
+    } else if (problem == "pr2392") {
+        n_cities = 2392;
+    } else if (problem == "rat783") {
+        n_cities = 783;
+    } else {
+        std::cout << "No valid import file provided. Please provide a valid import file." << std::endl;
+        exit(-1);
+    }
 
 	n_ants = nAnts;
-	n_cities = nCities;
 
 	randoms = new Randoms(15);
 
@@ -161,7 +148,7 @@ double init(int nAnts, int problem, int iterations) {
 			roulette_cities[c_index * N_ROULETTE + i] = city;
 		}
 	}
-
+    printf("%s;", problem.c_str());
 	double dist = optimize(iterations);
 	return dist;
 }
@@ -211,15 +198,15 @@ bool vizited(int antk, int c) {
 
 double PHI(int cityi, int cityj, int antk) {
 
-	double ETAij = (double) pow(1 / distance(cityi, cityj), BETA);
-	double TAUij = (double) pow(pheromones[(cityi * n_cities) + cityj],	ALPHA);
+	auto ETAij = (double) pow(1 / distance(cityi, cityj), BETA);
+	auto TAUij = (double) pow(pheromones[(cityi * n_cities) + cityj],	ALPHA);
 
 	double sum = 0.0;
 	for (int c = 0; c < n_cities; c++) {
 		if (exists(cityi, c) && (cityi != c)) {
 			if (!vizited(antk, c)) {
-				double ETA = (double) pow(1 / distance(cityi, c), BETA);
-				double TAU = (double) pow(
+				auto ETA = (double) pow(1 / distance(cityi, c), BETA);
+				auto TAU = (double) pow(
 						pheromones[(cityi * n_cities) + c], ALPHA);
 				sum += ETA * TAU;
 			}
@@ -228,8 +215,6 @@ double PHI(int cityi, int cityj, int antk) {
 	return (ETAij * TAUij) / sum;
 }
 
-//Calculates the distance of the complete tour
-//(including the distance from the last node to the initial node)
 double length(int antk) {
 	double sum = 0.0;
 	for (int j = 0; j < n_cities - 1; j++) {
@@ -447,11 +432,8 @@ void updatepheromones() {
 //Runs the tour construction and update pheromene for n iterations.
 double optimize(int it_n) {
 
-	printf("\n Number of it %i", it_n);
-	printf("\n Number of ants %i", n_ants);
-	printf("\n Number of cites %i", n_cities);
 
-	double mean_times = 0.0;
+	double calc_times = 0.0;
 	double rlength = 0.0;
 
 	//Iterations Loop
@@ -477,7 +459,7 @@ double optimize(int it_n) {
 
 		//Time measure for tour Construction
 		auto t_end = std::chrono::high_resolution_clock::now();
-		mean_times +=  std::chrono::duration<double>(t_end-t_start).count();
+        calc_times +=  std::chrono::duration<double>(t_end-t_start).count();
 
 		//Update Pheromones
 		updatepheromones();
@@ -490,106 +472,6 @@ double optimize(int it_n) {
 		}
 	}
 
-	printf("\n\n Total Time in tour construction: %f", mean_times);
-
-	//Calculate average time spent during tour construction
-	mean_times = mean_times / (it_n * n_ants);
-
-	printf("\n\n Average Time on Tour Construction: %f \n", mean_times);
-
-	printf("\n Best Route: \n");
-	for (int i = 0; i < n_cities; i++) {
-		printf(" %i ", best_route[i]);
-	}
-
+    printf("%d;%s;%f;", n_ants, "seq", calc_times);
 	return best_length;
-}
-
-// ===  FUNCTION  ======================================================================
-// PRINT FUNCTIONS:
-// =====================================================================================
-
-void printconnections() {
-	cout << " connections: " << endl;
-	cout << "  | ";
-	for (int i = 0; i < n_cities; i++) {
-		cout << i << " ";
-	}
-	cout << endl << "- | ";
-	for (int i = 0; i < n_cities; i++) {
-		cout << "- ";
-	}
-	cout << endl;
-	int count = 0;
-	for (int i = 0; i < n_cities; i++) {
-		cout << i << " | ";
-		for (int j = 0; j < n_cities; j++) {
-			if (i == j) {
-				cout << "x ";
-			} else {
-				cout << connections[i * n_cities + j] << " ";
-			}
-			if (connections[i * n_cities + j] == 1) {
-				count++;
-			}
-		}
-		cout << endl;
-	}
-	cout << endl;
-	cout << "Number of connections: " << count << endl << endl;
-}
-void printRESULTS() {
-	best_length += distance(best_route[n_cities - 1], initial_city);
-	cout << " BEST ROUTE:" << endl;
-	for (int i = 0; i < n_cities; i++) {
-		cout << best_route[i] << " ";
-	}
-	cout << endl << "length: " << best_length << endl;
-
-//	cout << endl << " IDEAL ROUTE:" << endl;
-//	cout << "0 7 6 2 4 5 1 3" << endl;
-//	cout << "length: 127.509" << endl;
-}
-
-void printPOSITIONS() {
-	printf("POSITIONS");
-
-	for (int i = 0; i < n_cities; i++) {
-		printf("\n City : %i", i);
-		printf(" X : %f", cities[i * 3 + 1]);
-		printf(" Y : %f", cities[i * 3 + 2]);
-	}
-}
-
-void printpheromones() {
-	cout << " pheromones: " << endl;
-	cout << "  | ";
-	for (int i = 0; i < n_cities; i++) {
-		printf("%5d   ", i);
-	}
-	cout << endl << "- | ";
-	for (int i = 0; i < n_cities; i++) {
-		cout << "--------";
-	}
-	cout << endl;
-	for (int i = 0; i < n_cities; i++) {
-		cout << i << " | ";
-		for (int j = 0; j < n_cities; j++) {
-			if (i == j) {
-				printf("%5s   ", "x");
-				continue;
-			}
-			if (exists(i, j)) {
-				printf("%7.3f ", pheromones[i * n_cities + j]);
-			} else {
-				if (pheromones[i * n_cities + j] == 0.0) {
-					printf("%5.0f   ", pheromones[i * n_cities + j]);
-				} else {
-					printf("%7.3f ", pheromones[i * n_cities + j]);
-				}
-			}
-		}
-		cout << endl;
-	}
-	cout << endl;
 }

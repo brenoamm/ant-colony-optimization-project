@@ -21,12 +21,10 @@ int n_cities = 0;
 int n_ants = 0;
 
 // ler o arquivo txt e inicia o pheromonio
-void readMap(double* coord, double* phero, int problem){
+void readMap(double* coord, double* phero, const std::string& problem){
 
 	readFile(coord, problem);
-
 	double randn = randoms -> Uniforme() * TAUMAX;
-
     for(int j = 0;j<n_cities;j++){
         for(int k = 0;k<n_cities;k++){
             if(j!=k){
@@ -37,13 +35,9 @@ void readMap(double* coord, double* phero, int problem){
             }
         }
     }
-
-
 }
 
-// calcula as distancias
 void calcDist(double* dist, double* coord){
-
     for(int i = 0;i<n_cities;i++){
         for(int j = 0;j<n_cities;j++){
             if(i!=j){
@@ -57,49 +51,37 @@ void calcDist(double* dist, double* coord){
     }
 }
 
-bool vizited (int* route, int cityc, int count) {
+bool vizited (const int* route, int cityc, int count) {
 
 	for (int l=0; l<count; l++) {
 		if (route[l] == cityc) {
-//			printf("\n Visited city %i result true",  cityc);
 			return true;
 		}
 	}
-//	printf("\n Visited city %i result false",  cityc);
 	return false;
 }
 
 int lock = 0;
 
 // cria a rota
-void route(double* phero, double* dist, int sequence[]){
+void route(double* phero, const double* dist, int sequence[]){
 
     int count = 0;
-    bool aux = true;
     double selection_prob[n_cities];
-    double sum_prob = 0.0;
     double r = 0.0;
     double p = 0.0;
     int l = 0;
 
-    //sequence[k] = (double)(rand()%n_cities);
-
-    //Initial City
     sequence[count] = 0;
-
     double sumPh = 0.0;
-
     while(count < n_cities-1){
 
     	sumPh = 0.0;
 
-    	sum_prob = 0.0;
-
-
-    	#pragma omp parallel num_threads(4)
+    	#pragma omp parallel num_threads(4) default(none) shared(sequence, count, selection_prob, sumPh, dist, phero, n_cities, lock) private(r, p, l)
     	{
 
-			#pragma omp parallel for reduction(+:sumPh)
+			#pragma omp parallel for reduction(+:sumPh) default(none) shared(sequence, count, selection_prob, dist, phero, n_cities, lock)
 			for(int i=0;i<n_cities;i++){
 				if(i != sequence[count] && !vizited(sequence, i, count)){
 					double ETA = pow(1/(dist[(sequence[count]*n_cities) +i]),BETA);
@@ -138,19 +120,15 @@ void route(double* phero, double* dist, int sequence[]){
     }
 }
 
-// evapora o pheromonio
 void pheroEvap(double* phero){
-
     for(int i = 0;i< n_cities;i++){
         for(int j=0;j<n_cities;j++){
             phero[(i* n_cities) + j] = (1-EVAPORATION)*phero[(i*n_cities)+j];
         }
     }
-
 }
 
-// deposita o pheromonio
-double pheroDeposit(int* sequence, double* dist, double* phero){
+double pheroDeposit(const int* sequence, const double* dist, double* phero){
 
     double totalDist = 0;
     for(int i = 0;i<n_cities-1;i++){
@@ -169,38 +147,46 @@ double pheroDeposit(int* sequence, double* dist, double* phero){
     return totalDist;
 }
 
-double run(int problem, int nants, int iterations, int runs, int n_threads)
+double run(const std::string&  problem, int nants, int iterations)
 {
 	randoms = new Randoms(15);
 
-//	printf("\n Problem : %i", problem);
-	//pre-processing
 
-	switch (problem) {
-		case 1:
-			n_cities = 38; //Djbouti
-			break;
-		case 2:
-			n_cities = 980; //Luxemburg
-			break;
-		default:
-			n_cities = 194; //Catar
-		}
-
-//	printf("\n N cities : %i", n_cities);
+    if (problem == "djibouti") {
+        n_cities = 38;
+    } else if (problem == "luxembourg") {
+        n_cities = 980;
+    } else if (problem == "catar") {
+        n_cities = 194;
+    } else if (problem == "a280") {
+        n_cities = 280;
+    } else if (problem == "d198") {
+        n_cities = 198;
+    } else if (problem == "d1291") {
+        n_cities = 1291;
+    } else if (problem == "lin318") {
+        n_cities = 318;
+    } else if (problem == "pcb442") {
+        n_cities = 442;
+    } else if (problem == "pcb1173") {
+        n_cities = 1173;
+    } else if (problem == "pr1002") {
+        n_cities = 1002;
+    } else if (problem == "pr2392") {
+        n_cities = 2392;
+    } else if (problem == "rat783") {
+        n_cities = 783;
+    } else {
+        std::cout << "No valid import file provided. Please provide a valid import file." << std::endl;
+        exit(-1);
+    }
 
 	n_ants =  nants;
-
-//	printf("\n max threads %i \n", omp_get_max_threads( ));
 
 	omp_set_nested(1);
     omp_set_num_threads(4);
 	omp_set_dynamic(0);
 
-//	printf("\n max threads %i \n", omp_get_max_threads( ));
-
-    double bestAll = 9999999999999999.9;
-    double a = omp_get_wtime();
     srand(time(NULL));
 
 	//int bestSequence[NCITY];
@@ -231,7 +217,6 @@ double run(int problem, int nants, int iterations, int runs, int n_threads)
 //		{
 //			#pragma omp for
 			for(int i = 0;i<n_ants;i++){
-//				if(i==0)printf("\n level 1 - %i threads", omp_get_num_threads());
 				route(phero, dist, sequence[i]);
 			}
 //		}
@@ -241,8 +226,7 @@ double run(int problem, int nants, int iterations, int runs, int n_threads)
 		for(int i = 0;i<n_ants;i++){
 			diste[i] = pheroDeposit(sequence[i],dist,phero);
 		}
-
-		for(int i = 0;i<n_ants;i++){
+		for (int i = 0;i<n_ants;i++) {
 			if(bestRoute>diste[i]){
 				bestRoute = diste[i];
 				for(int j = 0;j<n_cities;j++){
@@ -250,8 +234,6 @@ double run(int problem, int nants, int iterations, int runs, int n_threads)
 				}
 			}
 		}
-
-
 		inter -=1;
 	}
 

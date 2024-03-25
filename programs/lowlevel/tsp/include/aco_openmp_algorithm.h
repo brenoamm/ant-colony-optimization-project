@@ -3,9 +3,9 @@
 //  Description:  Runs aco with the parameter set regarding the problem, number of ants
 //				  number of iterations, number threads. It runs several times.
 // =====================================================================================
-double run(int problem, int nants, int iterations, int runs, int n_threads);
+double run(const std::string& problem, int nants, int iterations, int runs, int n_threads);
 
-void readMap(double* coord, double* phero, int problem);
+void readMap(double* coord, double* phero, const std::string& problem);
 
 void calcDist(double* dist, double* coord);
 

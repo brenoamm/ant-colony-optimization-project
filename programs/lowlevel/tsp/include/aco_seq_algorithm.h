@@ -1,4 +1,7 @@
-	double init (int nAnts, int problem, int iterations);
+
+#include <string>
+
+double init (int nAnts, const std::string& problem, int iterations);
 	
 	double optimize (int ITERATIONS);
 
